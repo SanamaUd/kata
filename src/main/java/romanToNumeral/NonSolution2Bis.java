@@ -5,8 +5,10 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class Solution2Bis implements Solution{
+public class NonSolution2Bis implements Solution{
 
 
   enum RomanSymbol{
@@ -43,7 +45,7 @@ public class Solution2Bis implements Solution{
   }
 
   private List<RomanSymbol> existingRomanSymbol;
-  public Solution2Bis(){
+  public NonSolution2Bis(){
     existingRomanSymbol = Arrays.asList(RomanSymbol.values());
     existingRomanSymbol.sort(Comparator.comparingInt(RomanSymbol::getQuantity));
     existingRomanSymbol.sort(Comparator.reverseOrder()); // we want the bigger values first
@@ -51,37 +53,48 @@ public class Solution2Bis implements Solution{
 
 
   public String convert(int value){
-    List<Integer> decomposition = roughDecompose(Arrays.asList(value));
     String result = "";
-    for(int item: decomposition){
-      result += translate(item);
-    }
+    result = convertInternal(value, result);
     return result;
   }
 
-  private List<Integer> roughDecompose(List<Integer> values){
-    values = new ArrayList<>(values);
-    int valueToDecompose = values.get(values.size() - 1);
-    for(RomanSymbol romanSymbol: existingRomanSymbol){
-      if(valueToDecompose == 0){
-        return values;
-      }
+  private String convertInternal(int value, String result){
+    if(value <=0){
+      return result;
+    }
+    int valueToDecompose = value;
+
+    int magnitude = (int)(Math.log10(valueToDecompose));
+    List<RomanSymbol> candidates = Stream.of(RomanSymbol.values())
+        .filter(symbol -> (int) (Math.log10(symbol.getQuantity())) == magnitude)// || (int) (Math.log10(symbol.getQuantity())) == magnitude+1)
+        .sorted(Comparator.reverseOrder())
+        .collect(Collectors.toList());
+
+    for(RomanSymbol romanSymbol: candidates){
       int leftover = valueToDecompose % romanSymbol.getQuantity();
       int quantity = valueToDecompose / romanSymbol.getQuantity();
-      if(!romanSymbol.isQuantityAllowed(quantity)){//if more than three letters required, subtract from bigger letter
 
-        RomanSymbol nextInRange = existingRomanSymbol.get(existingRomanSymbol.indexOf(romanSymbol)-1);
-        List<Integer> specialDecomposing = Arrays.asList(quantity * romanSymbol.getQuantity() - romanSymbol.getQuantity(),
-            nextInRange.getQuantity());
-        values = replaceLastValue(values, specialDecomposing);
-        valueToDecompose = leftover;
-        values.add(leftover);
+      if(String.valueOf(valueToDecompose).startsWith("4")
+          || String.valueOf(valueToDecompose).startsWith("9")){
+        //if more than three letters required, subtract from bigger letter
+        RomanSymbol nextInRange = findHigherRange(valueToDecompose);
+        int diff = Math.abs(valueToDecompose-nextInRange.getQuantity());
+        result += findSymbol((int)Math.pow(10,magnitude))+nextInRange.name();
+        if(String.valueOf(valueToDecompose).startsWith("9")){
+
+          result+=convertInternal(diff, "");
+        }
+        break;
       }
       if(quantity != 0){ // multiply the current letter
-        int rough = quantity * romanSymbol.getQuantity();
-        values = replaceLastValue(values, Arrays.asList(rough));
-        values.add(leftover);
+        for(int i =0; i< quantity; i++){
+          result += romanSymbol.name();
+        }
         valueToDecompose = leftover;
+        if(leftover > 0){
+          result = convertInternal(leftover, result);
+          break;
+        }
       }
 //      if(romanSymbol.canBeUsedForLowerValue(leftover)){ //subtract the current letter
 //        List<Integer> specialDecomposing = Arrays.asList(-romanSymbol.getDifferenceAllowed(), romanSymbol.getQuantity());
@@ -91,7 +104,22 @@ public class Solution2Bis implements Solution{
 //      }
       valueToDecompose = leftover;
     }
-    return values;
+
+    return result;
+  }
+
+
+  private RomanSymbol findHigherRange(int value){
+    return Stream.of(RomanSymbol.values())
+        .filter(symbol -> symbol.getQuantity() > value)
+        .findFirst().orElse(RomanSymbol.M);
+  }
+
+  private String findSymbol(int value){
+    return Stream.of(RomanSymbol.values())
+        .filter(romanSymbol -> value == romanSymbol.getQuantity())
+        .map(RomanSymbol::name)
+        .findFirst().orElse("");
   }
   private List<Integer> replaceLastValue(List<Integer> toReplace, List<Integer> valuesForReplacement){
     List<Integer> replacement = new ArrayList<>();
