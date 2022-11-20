@@ -3,6 +3,13 @@ package romanToNumeral;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * This solution reads each digit of the given arabic number from left to right,
+ * and convert each digit into Roman numeral with a simple logic.
+ *
+ * Pros: simple logic
+ * Cons: Can only support value from 0 to 9999. Requires many hardcoded Roman Values.
+ */
 public class Solution1 implements Solution{
 
   enum MapperDigit{
@@ -11,10 +18,10 @@ public class Solution1 implements Solution{
     THREE("3", "III", "XXX", "CCC", "MMM"),
     FOUR("4", "IV", "XL", "CD", "MMMM"),
     FIVE("5", "V", "L", "D", "MMMMM"),
-    SIX("6", "VI", "LX", "DC"),
-    SEVEN("7", "VII", "LXX", "DCC"),
-    EIGHT("8", "VIII", "LXXX", "DCCC"),
-    NINE("9", "IX", "XC", "CM");
+    SIX("6", "VI", "LX", "DC", "MMMMMM"),
+    SEVEN("7", "VII", "LXX", "DCC", "MMMMMMM"),
+    EIGHT("8", "VIII", "LXXX", "DCCC", "MMMMMMMM"),
+    NINE("9", "IX", "XC", "CM", "MMMMMMMMM");
 
     private String arabicSymbol;
     private List<String> romanSymbols;

@@ -5,6 +5,13 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * This solution breaks down a given arabic number into a list of multiple lower numbers that is adapted to Roman numerals.
+ * There is a configuration to interpret each Roman Symbol. It could be twisted to form different Roman Numeral
+ *
+ * Pros: Configurable (letter / value / subtracted value allowed). Can support any positive integer.
+ * Cons: More complex logic
+ */
 public class Solution2 implements Solution{
 
   enum RomanSymbol{
@@ -36,12 +43,12 @@ public class Solution2 implements Solution{
     }
   }
 
-  private List<RomanSymbol> existingRomanSymbols;
+  private List<RomanSymbol> descRomanSymbols;
 
   public Solution2(){
-    existingRomanSymbols = Arrays.asList(RomanSymbol.values());
-    existingRomanSymbols.sort(Comparator.comparingInt(RomanSymbol::getArabicNumeral));
-    existingRomanSymbols.sort(Comparator.reverseOrder()); // we want the bigger values first
+    descRomanSymbols = Arrays.asList(RomanSymbol.values());
+    descRomanSymbols.sort(Comparator.comparingInt(RomanSymbol::getArabicNumeral));
+    descRomanSymbols.sort(Comparator.reverseOrder()); // we want the bigger values first
   }
 
 
@@ -63,7 +70,7 @@ public class Solution2 implements Solution{
    */
   private List<Integer> decompose(int valueToDecompose){
     List<Integer> decomposition = new ArrayList<>();
-    for(RomanSymbol romanSymbol: existingRomanSymbols){
+    for(RomanSymbol romanSymbol: descRomanSymbols){
       if(valueToDecompose == 0){
         return decomposition;
       }
@@ -85,7 +92,7 @@ public class Solution2 implements Solution{
 
   private String translateEachArabicNumeral(int value){
     StringBuilder result = new StringBuilder();
-    for(RomanSymbol symbol: existingRomanSymbols){
+    for(RomanSymbol symbol: descRomanSymbols){
       int quantity = value/ symbol.getArabicNumeral();
       if(quantity != 0){
         for(int i = 0; i < quantity; i++){
