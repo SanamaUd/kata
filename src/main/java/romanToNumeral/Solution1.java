@@ -1,6 +1,7 @@
 package romanToNumeral;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class Solution1 implements Solution{
 
@@ -16,52 +17,39 @@ public class Solution1 implements Solution{
     NINE("9", "IX", "XC", "CM");
 
     private String arabicSymbol;
-    private String romanSymbolUnit;
-    private String romanSymbolDec;
-    private String romanSymbolCen;
-    private String romanSymbolMil;
+    private List<String> romanSymbols;
 
     MapperDigit(String arabicSymbol, String romanSymbolUnit, String romanSymbolDec, String romanSymbolCen){
       this(arabicSymbol, romanSymbolUnit, romanSymbolDec, romanSymbolCen, null);
     }
     MapperDigit(String arabicSymbol, String romanSymbolUnit, String romanSymbolDec, String romanSymbolCen, String romanSymbolMil){
       this.arabicSymbol = arabicSymbol;
-      this.romanSymbolUnit = romanSymbolUnit;
-      this.romanSymbolDec = romanSymbolDec;
-      this.romanSymbolCen = romanSymbolCen;
-      this.romanSymbolMil = romanSymbolMil;
+      this.romanSymbols = Arrays.asList(romanSymbolUnit, romanSymbolDec, romanSymbolCen, romanSymbolMil);
     }
 
-    public String findRomanSymbol(int index){
-      switch (index){
-        case 0:
-          return romanSymbolUnit;
-        case 1:
-          return romanSymbolDec;
-        case 2:
-          return romanSymbolCen;
-        case 3:
-          return romanSymbolMil;
-        default:
-          throw new RuntimeException("Not supported");
+    public String findRomanSymbol(int orderMagnitude){
+      try{
+        return romanSymbols.get(orderMagnitude);
+      } catch (RuntimeException e){
+        throw new RuntimeException(String.format("Order of Magnitude %d not found", orderMagnitude), e);
       }
     }
   }
 
   public String convert(int value){
-    String number = Integer.toString(value);
-    String result = "";
-    for(int index = 0; index <number.length(); index++){
-      String arabicSymbol = String.valueOf(number.charAt(index));
-      result = result + convertToRoman(arabicSymbol, number.length() -1 - index);
+    String arabicNumeral = Integer.toString(value);
+    StringBuilder result = new StringBuilder();
+    for(int orderMagnitude = 0; orderMagnitude <arabicNumeral.length(); orderMagnitude++){
+      String arabicSymbol = String.valueOf(arabicNumeral.charAt(orderMagnitude));
+      result.append(convertToRoman(arabicSymbol, arabicNumeral.length() -1 - orderMagnitude));
     }
-    return result;
+    return result.toString();
   }
 
-  public String convertToRoman(String arabicSymbol, int index){
+  private String convertToRoman(String arabicSymbol, int orderMagnitude){
     return Arrays.stream(MapperDigit.values())
         .filter(mapper -> arabicSymbol.equals(mapper.arabicSymbol))
-        .map(mapper -> mapper.findRomanSymbol(index))
+        .map(mapper -> mapper.findRomanSymbol(orderMagnitude))
         .findFirst()
         .orElse(""); // zero
 

@@ -30,7 +30,9 @@ public class TestRomanToNumeral {
     assertEquals("XL", systemUnderTest.convert(40));
     assertEquals("XCV", systemUnderTest.convert(95));
     assertEquals("C", systemUnderTest.convert(100));
+    assertEquals("CXI", systemUnderTest.convert(111));
     assertEquals("CCLIII", systemUnderTest.convert(253));
+    assertEquals("CDXLVIII", systemUnderTest.convert(448));
     assertEquals("MMXXIII", systemUnderTest.convert(2023));
     assertEquals("MCMXCII", systemUnderTest.convert(1992));
     assertEquals("MCCCLXXII", systemUnderTest.convert(1372));
