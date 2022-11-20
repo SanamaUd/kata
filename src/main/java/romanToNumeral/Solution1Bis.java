@@ -3,7 +3,7 @@ package romanToNumeral;
 import java.util.Arrays;
 import java.util.List;
 
-public class Solution1Bis {
+public class Solution1Bis implements Solution{
 
   enum MapperDigit{
     ONE("1", "I", "X", "C", "M"),

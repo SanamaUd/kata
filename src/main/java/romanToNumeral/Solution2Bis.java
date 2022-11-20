@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class Solution2 implements Solution{
+public class Solution2Bis implements Solution{
 
 
   enum RomanSymbol{
@@ -43,7 +43,7 @@ public class Solution2 implements Solution{
   }
 
   private List<RomanSymbol> existingRomanSymbol;
-  public Solution2(){
+  public Solution2Bis(){
     existingRomanSymbol = Arrays.asList(RomanSymbol.values());
     existingRomanSymbol.sort(Comparator.comparingInt(RomanSymbol::getQuantity));
     existingRomanSymbol.sort(Comparator.reverseOrder()); // we want the bigger values first
@@ -68,18 +68,27 @@ public class Solution2 implements Solution{
       }
       int leftover = valueToDecompose % romanSymbol.getQuantity();
       int quantity = valueToDecompose / romanSymbol.getQuantity();
+      if(!romanSymbol.isQuantityAllowed(quantity)){//if more than three letters required, subtract from bigger letter
+
+        RomanSymbol nextInRange = existingRomanSymbol.get(existingRomanSymbol.indexOf(romanSymbol)-1);
+        List<Integer> specialDecomposing = Arrays.asList(quantity * romanSymbol.getQuantity() - romanSymbol.getQuantity(),
+            nextInRange.getQuantity());
+        values = replaceLastValue(values, specialDecomposing);
+        valueToDecompose = leftover;
+        values.add(leftover);
+      }
       if(quantity != 0){ // multiply the current letter
         int rough = quantity * romanSymbol.getQuantity();
         values = replaceLastValue(values, Arrays.asList(rough));
         values.add(leftover);
         valueToDecompose = leftover;
       }
-      if(romanSymbol.canBeUsedForLowerValue(leftover)){ //subtract the current letter
-        List<Integer> specialDecomposing = Arrays.asList(-romanSymbol.getDifferenceAllowed(), romanSymbol.getQuantity());
-        values = replaceLastValue(values, specialDecomposing);
-        leftover = valueToDecompose - (specialDecomposing.stream().reduce(0, Integer::sum));
-        values.add(leftover);
-      }
+//      if(romanSymbol.canBeUsedForLowerValue(leftover)){ //subtract the current letter
+//        List<Integer> specialDecomposing = Arrays.asList(-romanSymbol.getDifferenceAllowed(), romanSymbol.getQuantity());
+//        values = replaceLastValue(values, specialDecomposing);
+//        leftover = valueToDecompose - (specialDecomposing.stream().reduce(0, Integer::sum));
+//        values.add(leftover);
+//      }
       valueToDecompose = leftover;
     }
     return values;
